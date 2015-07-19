@@ -1,25 +1,39 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
 1. Loading the zip file as a data table
 
-```{r,echo=TRUE}
+
+```r
 library(data.table)
+```
+
+```
+## Warning: package 'data.table' was built under R version 3.1.3
+```
+
+```r
 dataFrame <- read.csv(unz("activity.zip", "activity.csv"))
 data <- as.data.table(dataFrame)
 ```
 
 2. Showing the header of this data table
 
-```{r,echo=TRUE}
+
+```r
 head(data)
+```
+
+```
+##    steps       date interval
+## 1:    NA 2012-10-01        0
+## 2:    NA 2012-10-01        5
+## 3:    NA 2012-10-01       10
+## 4:    NA 2012-10-01       15
+## 5:    NA 2012-10-01       20
+## 6:    NA 2012-10-01       25
 ```
 
 
@@ -28,7 +42,8 @@ head(data)
 
 1. Calculating the total number of steps taken per day and storing the result
 
-```{r, echo=TRUE}
+
+```r
 # ignoring the missing values
 dataWithoutMissingValues <- data[data[,!is.na(steps)],]
 # calculating the total number of steps
@@ -39,7 +54,8 @@ setnames(totalNumberStepsPerDay, c("date", "numberOfStepsPerDay"))
 
 2. Making a histogram of the total number of steps taken each day
 
-```{r, echo=TRUE}
+
+```r
 library(graphics)
 # calculating the histogram
 hist(totalNumberStepsPerDay$numberOfStepsPerDay, 
@@ -48,18 +64,33 @@ hist(totalNumberStepsPerDay$numberOfStepsPerDay,
      sub = "(Note: Missing values have been ignored)")
 ```
 
+![](./PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
 3. Calculating and reporting the mean and the median of the total number of steps taken per day
 
-```{r, echo=TRUE}
+
+```r
 paste("Mean  = ", mean(totalNumberStepsPerDay$numberOfStepsPerDay))
+```
+
+```
+## [1] "Mean  =  10766.1886792453"
+```
+
+```r
 paste("Median =", median(totalNumberStepsPerDay$numberOfStepsPerDay))
+```
+
+```
+## [1] "Median = 10765"
 ```
 
 ## What is the average daily activity pattern?
 
 1. Calculating and plotting the average number of steps per 5-minute interval
 
-```{r, echo=TRUE}
+
+```r
 # calculating the average number of steps per 5-minute interval in a day
 averageNumberStepsPer5minuteInteval <- data[,mean(steps, na.rm=TRUE),by=interval]
 # setting the column names of the variable 'averageNumberStepsPer5minuteInteval' 
@@ -73,12 +104,19 @@ plot(averageNumberStepsPer5minuteInteval$interval,
      ylab = "average number of steps")
 ```
 
+![](./PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+
 2. Calculating the 5-minute interval with the maximum number of steps
 
-```{r, echo = TRUE}
+
+```r
 # retrieving the 5-minute interval with the maximum number of steps (averaged across all observations)
 averageNumberStepsPer5minuteInteval[order(averageNumberOfSteps,decreasing=TRUE),][1]
+```
 
+```
+##    interval averageNumberOfSteps
+## 1:      835             206.1698
 ```
 
 
@@ -86,13 +124,18 @@ averageNumberStepsPer5minuteInteval[order(averageNumberOfSteps,decreasing=TRUE),
 
 1. Calculating the number of rows with missing values
 
-```{r, echo=TRUE}
-paste( "Number of rows with missing values = ", length(which(is.na(data$steps))))
 
+```r
+paste( "Number of rows with missing values = ", length(which(is.na(data$steps))))
+```
+
+```
+## [1] "Number of rows with missing values =  2304"
 ```
 
 2. Filling in the missing values with the average number of steps for their 5-minute interval, and storing the result in a new data table
-```{r, echo=TRUE}
+
+```r
 ## making a copy of the data into the variable 'cleandata'
 cleanData <- copy(data)
 ## replacing the NA values in 'cleandata' by the average steps for the respective 5-minute interval
@@ -103,12 +146,12 @@ for(i in 1:length(cleanData$steps)){
             averageNumberStepsPer5minuteInteval[interval==intervalWithMissingMeasurement]$averageNumberOfSteps
     }    
 }
-
 ```
 
 3. Histogram of the total number of steps taken each day for the clean dataset
 
-```{r, echo=TRUE}
+
+```r
 # calculating the total number of steps per day for the clean dataset
 totalNumberStepsPerDayCleanData <- cleanData[,sum(steps),by=date]
 # setting the column names 
@@ -119,11 +162,25 @@ hist(totalNumberStepsPerDayCleanData$numberOfStepsPerDay,
      main = paste("Histogram of the number of steps per day \n(after imputing missing values)"))
 ```
 
+![](./PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+
 4. Calculating and reporting the mean and the median of the total number of steps taken per day, based on the clean dataset
 
-```{r, echo=TRUE}
+
+```r
 paste("Mean clean dataset = ", mean(totalNumberStepsPerDayCleanData$numberOfStepsPerDay))
+```
+
+```
+## [1] "Mean clean dataset =  10766.1886792453"
+```
+
+```r
 paste("Median clean dataset =", median(totalNumberStepsPerDayCleanData$numberOfStepsPerDay))
+```
+
+```
+## [1] "Median clean dataset = 10766.1886792453"
 ```
 
 
@@ -131,9 +188,28 @@ paste("Median clean dataset =", median(totalNumberStepsPerDayCleanData$numberOfS
 
 1. Adding a new column in the clean data to indicate whether a given data is a weekday or weekend day
 
-```{r, echo=TRUE}
+
+```r
 ## adding the new column 'weekPeriod'
 cleanData[,weekPeriod:=weekdays(as.Date(cleanData$date))]
+```
+
+```
+##            steps       date interval weekPeriod
+##     1: 1.7169811 2012-10-01        0     Monday
+##     2: 0.3396226 2012-10-01        5     Monday
+##     3: 0.1320755 2012-10-01       10     Monday
+##     4: 0.1509434 2012-10-01       15     Monday
+##     5: 0.0754717 2012-10-01       20     Monday
+##    ---                                         
+## 17564: 4.6981132 2012-11-30     2335     Friday
+## 17565: 3.3018868 2012-11-30     2340     Friday
+## 17566: 0.6415094 2012-11-30     2345     Friday
+## 17567: 0.2264151 2012-11-30     2350     Friday
+## 17568: 1.0754717 2012-11-30     2355     Friday
+```
+
+```r
 ## setting the value of the column 'weekPeriod' to "weekend" or "weekday"
 for(i in 1:length(cleanData$steps)){
     if(cleanData$weekPeriod[i] == "Saturday" || cleanData$weekPeriod[i] == "Sunday"){
@@ -146,7 +222,8 @@ for(i in 1:length(cleanData$steps)){
 
 2. Making a panel plot with the average number of steps in weekdays and weekends
 
-```{r, echo=TRUE}
+
+```r
 # calculating the average number of steps for a given the combinations (weekPeriod, 5-minute interval)
 averageStepsPerWeekperiodAndInterval <- cleanData[,mean(steps, na.rm=TRUE),by=c("weekPeriod","interval")]
 setnames(averageStepsPerWeekperiodAndInterval, c("weekPeriod", "interval", "averageNumberOfSteps"))
@@ -163,8 +240,9 @@ xyplot(averageNumberOfSteps ~ interval | weekPeriod,
        },
        layout = c(1,2)
        )
-
 ```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-13-1.png) 
 
 
 Note that the individual walks more during the weekends!
